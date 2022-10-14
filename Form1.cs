@@ -2,7 +2,14 @@ namespace Polygon
 {
     public partial class Form1 : Form
     {
-        Vertex point = new Vertex(100, 100, 10, 0);
+        //Vertex point = new Vertex(100, 100, 10, 0);
+        List<Vertex> points = new List<Vertex>();
+        bool wasAnyPointTouched = false;
+        Shapes shape = Shapes.Circle;
+        private void AddPoint(int mX, int mY,int r)
+        {
+            points.Add(new Vertex(mX, mY, r, shape));
+        }
 
         public Form1()
         {
@@ -11,27 +18,97 @@ namespace Polygon
             //Vertex point = new Vertex(100, 100, 10, 0, g);
         }
 
-        private void Form1_Paint(object sender, PaintEventArgs e)
+        private void Refresh()
         {
-            point.Draw(e.Graphics);
+            Graphics g = CreateGraphics();
+            g.Clear(Color.White);
+            foreach (Vertex point in points) point.Draw(g);
         }
+
+        /*private void Form1_Paint(object sender, PaintEventArgs e)
+        {
+            foreach (Vertex point in points) point.Draw(e.Graphics);
+        }*/
 
         private void Form1_MouseDown(object sender, MouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Left && point.IsTouched(e.X, e.Y)) point.Carried = true;
+            int hitnum = -1;
+            foreach (Vertex point in points)
+            {
+                if (e.Button == MouseButtons.Left && point.IsTouched(e.X, e.Y))
+                {
+                    point.Carried = true;
+                    wasAnyPointTouched = true;
+                }
+                else if (point.IsTouched(e.X, e.Y))
+                {
+                    hitnum = points.IndexOf(point);
+                    wasAnyPointTouched = true;
+                }
+            }
+            if (!wasAnyPointTouched) 
+            {
+                AddPoint(e.X, e.Y, 10);
+                Refresh();
+                PointsCounter.Text = points.Count.ToString();
+            }
+            if (hitnum != -1)
+            {
+                points.RemoveAt(hitnum);
+                Refresh();
+            }
+            wasAnyPointTouched = false;
         }
 
         private void Form1_MouseMove(object sender, MouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Left && point.Carried)
+            foreach (Vertex point in points)
             {
-                point.Move(e.X, e.Y);
-            } 
+                if (e.Button == MouseButtons.Left && point.Carried)
+                {
+                    point.Move(e.X, e.Y);
+                    Refresh();
+                }
+            }
         }
 
         private void Form1_MouseUp(object sender, MouseEventArgs e)
         {
+            foreach (Vertex point in points) point.Carried = false;
+        }
 
+        private void circleToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
+        {
+            PointsCounter.Text = "C";
+            if (circleToolStripMenuItem.Checked) shape = Shapes.Circle; 
+        }
+
+        private void squareToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
+        {
+            if (squareToolStripMenuItem.Checked) shape = Shapes.Square;
+        }
+
+        private void triangleToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
+        {
+            if (triangleToolStripMenuItem.Checked) shape = Shapes.Triangle;
+        }
+
+        private void circleToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            PointsCounter.Text = "C";
+            shape = Shapes.Circle;
+        }
+
+        private void squareToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            PointsCounter.Text = "S";
+            shape = Shapes.Square;
+        }
+
+        private void triangleToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            PointsCounter.Text = "T";
+            shape = Shapes.Triangle;
         }
     }
 }
