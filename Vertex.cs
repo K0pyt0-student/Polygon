@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Microsoft.VisualBasic.Devices;
+using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,48 +9,23 @@ using System.Threading.Tasks;
 namespace Polygon
 {
     enum Shapes {Circle, Square, Triangle }
-    internal class Vertex
+    internal abstract class Vertex
     {
-        private int x;
-        private int y;
-        private int r;
-        private bool IsBeingCarried;
-        private int shiftX;
-        private int shiftY;
-        private Shapes shape;
-        private Point[] points = new Point[3];
+        protected int x;
+        protected int y;
+        protected int r;
+        protected bool IsBeingCarried;
+        protected int shiftX;
+        protected int shiftY;
 
-        public void Draw(Graphics g)
-        {
-            Brush brush = new SolidBrush(Color.Black);
-            switch (shape)
-            {
-                case Shapes.Circle: g.FillEllipse(brush, x - r, y - r, 2 * r, 2 * r); break;
-                case Shapes.Square: g.FillRectangle(brush, x - r, y - r, 2 * r, 2 * r); break;
-                case Shapes.Triangle: g.FillPolygon(brush, points); break;
-            }
-        }
+        public abstract void Draw(Graphics g);
+        public abstract bool IsTouched(int MouseX, int MouseY);
+           
 
-        public bool IsTouched(int MouseX, int MouseY)
-        {
-            shiftX = MouseX - x;
-            shiftY = MouseY - y;
-            switch (shape)
-            {
-                case Shapes.Circle: return Math.Pow(shiftX, 2) + Math.Pow(shiftY, 2) <= r * r;
-                case Shapes.Square: return Math.Abs(shiftX) <= r && Math.Abs(shiftY) <= r;
-                case Shapes.Triangle: return shiftY <= r && shiftY >= - 2 / Math.Sqrt(3) * shiftX - r && shiftY >= 2 / Math.Sqrt(3) * shiftX - r;
-                default: return false;
-            }
-        }
-
-        public void Move(int mouseX, int mouseY)
+        public virtual void Move(int mouseX, int mouseY)
         {
             x = mouseX - shiftX;
             y = mouseY - shiftY;
-            points[0] = new Point(Convert.ToInt32(x - Math.Sqrt(3) * r), y + r);
-            points[1] = new Point(Convert.ToInt32(x + Math.Sqrt(3) * r), y + r);
-            points[2] = new Point(x, y - r);
         }
 
         public Vertex()
@@ -57,29 +34,88 @@ namespace Polygon
             y = 100;
             r = 10;
             IsBeingCarried = false;
-            shape = Shapes.Circle;
         }
 
-        public Vertex(int x, int y, int r, Shapes shape)
+        public  Vertex(int x, int y, int r)
         {
             this.x = x;
             this.y = y;
             this.r = r;
             IsBeingCarried = false;
-            this.shape = shape;
-            if (shape == Shapes.Triangle)
-            {
-                points[0] = new Point(Convert.ToInt32(x - Math.Sqrt(3) * r), y + r);
-                points[1] = new Point(Convert.ToInt32(x + Math.Sqrt(3) * r), y + r);
-                points[2] = new Point(x, y - r);
-            }
         }
 
         public bool Carried
         {
             get { return IsBeingCarried; }
             set { IsBeingCarried = value; }
+        }
+    }
 
+    internal class Сircle : Vertex
+    {
+        public Сircle(int x, int y, int r) : base(x, y, r) { }
+
+        public override void Draw(Graphics g)
+        {
+            Brush brush = new SolidBrush(Color.Black);
+            g.FillEllipse(brush, x - r, y - r, 2 * r, 2 * r);
+        }
+
+        public override bool IsTouched(int MouseX, int MouseY)
+        {
+            shiftX = MouseX - x;
+            shiftY = MouseY - y;
+            return shiftX * shiftX + shiftY * shiftY <= r * r;
+        }
+    }
+    
+    internal class Square : Vertex
+    {
+        public Square(int x, int y, int r) : base(x, y, r) { }
+        
+        public override void Draw(Graphics g)
+        {
+            Brush brush = new SolidBrush(Color.Black);
+            g.FillRectangle(brush, x - r, y - r, 2 * r, 2 * r);
+        }
+
+        public override bool IsTouched(int MouseX, int MouseY)
+        {
+            shiftX = MouseX - x;
+            shiftY = MouseY - y;
+            return Math.Abs(shiftX) <= r && Math.Abs(shiftY) <= r;
+        }
+    }
+    
+    internal class Triangle : Vertex
+    {
+        private Point[] points = new Point[3];
+        public Triangle(int x, int y, int r) : base(x, y, r) 
+        {
+            points[0] = new Point(Convert.ToInt32(x - Math.Sqrt(3) * r), y + r);
+            points[1] = new Point(Convert.ToInt32(x + Math.Sqrt(3) * r), y + r);
+            points[2] = new Point(x, y - r);
+        }
+
+        public override void Move(int mouseX, int mouseY)
+        {
+            base.Move(mouseX, mouseY);
+            points[0] = new Point(Convert.ToInt32(x - Math.Sqrt(3) * r), y + r);
+            points[1] = new Point(Convert.ToInt32(x + Math.Sqrt(3) * r), y + r);
+            points[2] = new Point(x, y - r);
+        }
+
+        public override void Draw(Graphics g)
+        {
+            Brush brush = new SolidBrush(Color.Black);
+            g.FillPolygon(brush, points);
+        }
+
+        public override bool IsTouched(int MouseX, int MouseY)
+        {
+            shiftX = MouseX - x;
+            shiftY = MouseY - y;
+            return shiftY <= r && shiftY >= -2 / Math.Sqrt(3) * shiftX - r && shiftY >= 2 / Math.Sqrt(3) * shiftX - r;
         }
     }
 }

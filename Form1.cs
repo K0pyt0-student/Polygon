@@ -8,7 +8,14 @@ namespace Polygon
         Shapes shape = Shapes.Circle;
         private void AddPoint(int mX, int mY,int r)
         {
-            points.Add(new Vertex(mX, mY, r, shape));
+            switch(shape)
+            {
+                case Shapes.Circle: points.Add(new Ñircle(mX, mY, r)); break;
+                case Shapes.Square: points.Add(new Square(mX, mY, r)); break;
+                case Shapes.Triangle: points.Add(new Triangle(mX, mY, r)); break;
+                default: points.Add(new Ñircle(mX, mY, r)); break;
+            }
+            
         }
 
         public Form1()
