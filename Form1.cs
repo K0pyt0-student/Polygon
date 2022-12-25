@@ -13,7 +13,7 @@ namespace Polygon
                 case Shapes.Circle: points.Add(new Ñircle(mX, mY, r)); break;
                 case Shapes.Square: points.Add(new Square(mX, mY, r)); break;
                 case Shapes.Triangle: points.Add(new Triangle(mX, mY, r)); break;
-                default: points.Add(new Ñircle(mX, mY, r)); break;
+                default: points.Add(new Ñircle(mX, mY, r)); break;    
             }
             
         }
@@ -30,6 +30,7 @@ namespace Polygon
             Graphics g = CreateGraphics();
             g.Clear(Color.White);
             foreach (Vertex point in points) point.Draw(g);
+            if (points.Count >= 3) CreateShell();
         }
 
         /*private void Form1_Paint(object sender, PaintEventArgs e)
@@ -116,6 +117,6 @@ namespace Polygon
         {
             PointsCounter.Text = "T";
             shape = Shapes.Triangle;
-        }
+        }   
     }
 }

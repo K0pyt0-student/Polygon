@@ -18,6 +18,17 @@ namespace Polygon
         protected int shiftX;
         protected int shiftY;
 
+        public int X
+        {
+            get { return x; }
+            set { x = value; }
+        }
+        public int Y
+        {
+            get { return y; }
+            set { y = value; }
+        }
+
         public abstract void Draw(Graphics g);
         public abstract bool IsTouched(int MouseX, int MouseY);
            
