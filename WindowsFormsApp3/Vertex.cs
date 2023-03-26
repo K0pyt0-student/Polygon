@@ -8,31 +8,44 @@ using System.Drawing;
 namespace WindowsFormsApp3
 {
     enum Shapes { Circle, Square, Triangle }
+    [Serializable]
     internal abstract class Vertex
     {
-        protected int x;
-        protected int y;
+        protected float x;
+        protected float y;
         protected int r;
+        [NonSerialized]
         protected bool IsBeingCarried;
-        protected int shiftX;
-        protected int shiftY;
+        [NonSerialized]
+        protected float shiftX;
+        [NonSerialized]
+        protected float shiftY;
+        [NonSerialized]
+        protected bool isShell = false;
 
-        public int X
+        public float X
         {
             get { return x; }
             set { x = value; }
         }
-        public int Y
+        public float Y
         {
             get { return y; }
             set { y = value; }
         }
 
+        public bool IsShell
+        {
+            get { return isShell; }
+            set { isShell = value; }
+        }
+
         public abstract void Draw(Graphics g);
-        public abstract bool IsTouched(int MouseX, int MouseY);
+        public abstract void Draw(Graphics g, Color color);
+        public abstract bool IsTouched(float MouseX, float MouseY);
 
 
-        public virtual void Move(int mouseX, int mouseY)
+        public virtual void Move(float mouseX, float mouseY)
         {
             x = mouseX - shiftX;
             y = mouseY - shiftY;
@@ -46,7 +59,7 @@ namespace WindowsFormsApp3
             IsBeingCarried = false;
         }
 
-        public Vertex(int x, int y, int r)
+        public Vertex(float x, float y, int r)
         {
             this.x = x;
             this.y = y;
@@ -61,9 +74,9 @@ namespace WindowsFormsApp3
         }
     }
 
-    internal class Сircle : Vertex
+    internal class Circle : Vertex
     {
-        public Сircle(int x, int y, int r) : base(x, y, r) { }
+        public Circle(float x, float y, int r) : base(x, y, r) { }
 
         public override void Draw(Graphics g)
         {
@@ -71,7 +84,13 @@ namespace WindowsFormsApp3
             g.FillEllipse(brush, x - r, y - r, 2 * r, 2 * r);
         }
 
-        public override bool IsTouched(int MouseX, int MouseY)
+        public override void Draw(Graphics g, Color color)
+        {
+            Brush brush = new SolidBrush(color);
+            g.FillEllipse(brush, x - r, y - r, 2 * r, 2 * r);
+        }
+
+        public override bool IsTouched(float MouseX, float MouseY)
         {
             shiftX = MouseX - x;
             shiftY = MouseY - y;
@@ -89,7 +108,13 @@ namespace WindowsFormsApp3
             g.FillRectangle(brush, x - r, y - r, 2 * r, 2 * r);
         }
 
-        public override bool IsTouched(int MouseX, int MouseY)
+        public override void Draw(Graphics g, Color color)
+        {
+            Brush brush = new SolidBrush(color);
+            g.FillRectangle(brush, x - r, y - r, 2 * r, 2 * r);
+        }
+
+        public override bool IsTouched(float MouseX, float MouseY)
         {
             shiftX = MouseX - x;
             shiftY = MouseY - y;
@@ -99,20 +124,20 @@ namespace WindowsFormsApp3
 
     internal class Triangle : Vertex
     {
-        private Point[] points = new Point[3];
-        public Triangle(int x, int y, int r) : base(x, y, r)
+        private PointF[] points = new PointF[3];
+        public Triangle(float x, float y, int r) : base(x, y, r)
         {
-            points[0] = new Point(Convert.ToInt32(x - Math.Sqrt(3) * r), y + r);
-            points[1] = new Point(Convert.ToInt32(x + Math.Sqrt(3) * r), y + r);
-            points[2] = new Point(x, y - r);
+            points[0] = new PointF(Convert.ToInt32(x - Math.Sqrt(3) * r), y + r);
+            points[1] = new PointF(Convert.ToInt32(x + Math.Sqrt(3) * r), y + r);
+            points[2] = new PointF(x, y - r);
         }
 
-        public override void Move(int mouseX, int mouseY)
+        public override void Move(float mouseX, float mouseY)
         {
             base.Move(mouseX, mouseY);
-            points[0] = new Point(Convert.ToInt32(x - Math.Sqrt(3) * r), y + r);
-            points[1] = new Point(Convert.ToInt32(x + Math.Sqrt(3) * r), y + r);
-            points[2] = new Point(x, y - r);
+            points[0] = new PointF(Convert.ToInt32(x - Math.Sqrt(3) * r), y + r);
+            points[1] = new PointF(Convert.ToInt32(x + Math.Sqrt(3) * r), y + r);
+            points[2] = new PointF(x, y - r);
         }
 
         public override void Draw(Graphics g)
@@ -121,7 +146,13 @@ namespace WindowsFormsApp3
             g.FillPolygon(brush, points);
         }
 
-        public override bool IsTouched(int MouseX, int MouseY)
+        public override void Draw(Graphics g, Color color)
+        {
+            Brush brush = new SolidBrush(color);
+            g.FillPolygon(brush, points);
+        }
+
+        public override bool IsTouched(float MouseX, float MouseY)
         {
             shiftX = MouseX - x;
             shiftY = MouseY - y;
