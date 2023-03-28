@@ -34,6 +34,12 @@ namespace WindowsFormsApp3
             set { y = value; }
         }
 
+        public int radius
+        {
+            get { return r; }
+            set { r = value; }
+        }
+
         public bool IsShell
         {
             get { return isShell; }

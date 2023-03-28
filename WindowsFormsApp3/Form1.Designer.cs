@@ -38,6 +38,9 @@
             this.circleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.squareToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.triangleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.radiusToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.colorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.methodToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.byDefinitionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.jarvisToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -46,6 +49,8 @@
             this.PointsCounter = new System.Windows.Forms.Label();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.startShaking_button = new System.Windows.Forms.Button();
+            this.stopShaking_button = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -54,6 +59,7 @@
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
             this.формаToolStripMenuItem,
+            this.settingsToolStripMenuItem,
             this.methodToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
@@ -134,6 +140,28 @@
             this.triangleToolStripMenuItem.CheckedChanged += new System.EventHandler(this.triangleToolStripMenuItem_CheckedChanged);
             this.triangleToolStripMenuItem.Click += new System.EventHandler(this.triangleToolStripMenuItem_Click);
             // 
+            // settingsToolStripMenuItem
+            // 
+            this.settingsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.radiusToolStripMenuItem,
+            this.colorToolStripMenuItem});
+            this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
+            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(96, 20);
+            this.settingsToolStripMenuItem.Text = "Figure settings";
+            // 
+            // radiusToolStripMenuItem
+            // 
+            this.radiusToolStripMenuItem.Name = "radiusToolStripMenuItem";
+            this.radiusToolStripMenuItem.Size = new System.Drawing.Size(109, 22);
+            this.radiusToolStripMenuItem.Text = "Radius";
+            this.radiusToolStripMenuItem.Click += new System.EventHandler(this.radiusToolStripMenuItem_Click);
+            // 
+            // colorToolStripMenuItem
+            // 
+            this.colorToolStripMenuItem.Name = "colorToolStripMenuItem";
+            this.colorToolStripMenuItem.Size = new System.Drawing.Size(109, 22);
+            this.colorToolStripMenuItem.Text = "Color";
+            // 
             // methodToolStripMenuItem
             // 
             this.methodToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -186,11 +214,33 @@
             // 
             this.openFileDialog.FileName = "openFileDialog1";
             // 
+            // startShaking_button
+            // 
+            this.startShaking_button.Location = new System.Drawing.Point(0, 27);
+            this.startShaking_button.Name = "startShaking_button";
+            this.startShaking_button.Size = new System.Drawing.Size(89, 23);
+            this.startShaking_button.TabIndex = 3;
+            this.startShaking_button.Text = "Start shaking";
+            this.startShaking_button.UseVisualStyleBackColor = true;
+            this.startShaking_button.Click += new System.EventHandler(this.startShaking_button_Click);
+            // 
+            // stopShaking_button
+            // 
+            this.stopShaking_button.Location = new System.Drawing.Point(95, 27);
+            this.stopShaking_button.Name = "stopShaking_button";
+            this.stopShaking_button.Size = new System.Drawing.Size(89, 23);
+            this.stopShaking_button.TabIndex = 4;
+            this.stopShaking_button.Text = "Stop shaking";
+            this.stopShaking_button.UseVisualStyleBackColor = true;
+            this.stopShaking_button.Click += new System.EventHandler(this.stopShaking_button_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.stopShaking_button);
+            this.Controls.Add(this.startShaking_button);
             this.Controls.Add(this.PointsCounter);
             this.Controls.Add(this.menuStrip1);
             this.DoubleBuffered = true;
@@ -228,6 +278,11 @@
         private System.Windows.Forms.ToolStripMenuItem saveAsToolStripMenuItem;
         private System.Windows.Forms.OpenFileDialog openFileDialog;
         private System.Windows.Forms.SaveFileDialog saveFileDialog;
+        private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem radiusToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem colorToolStripMenuItem;
+        private System.Windows.Forms.Button startShaking_button;
+        private System.Windows.Forms.Button stopShaking_button;
     }
 }
 

@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+using System.Timers;
 
 namespace WindowsFormsApp3
 {
@@ -26,7 +27,8 @@ namespace WindowsFormsApp3
         //Vertex point = new Vertex(100, 100, 10, 0);
         List<Vertex> points = new List<Vertex>();
         List<Vertex> chPoints = new List<Vertex>();
-        bool wasAnyPointTouched = false;
+        Random rnd = new Random();
+        System.Timers.Timer tmr = new System.Timers.Timer(10);        bool wasAnyPointTouched = false;
         bool isFigureCarried = false;
         Shapes shape = Shapes.Circle;
         bool jarv = true;
@@ -34,17 +36,19 @@ namespace WindowsFormsApp3
         bool checkPerfJ = false;
         bool saveIsActual = false;
         string filename;
+        int radius = 10;
+        //bool shaking = false;
         #endregion
 
         #region Canvas_clicks_handler
-        private void AddPoint(int mX, int mY, int r)
+        private void AddPoint(int mX, int mY)
         {
             switch (shape)
             {
-                case Shapes.Circle: points.Add(new Circle(mX, mY, r)); break;
-                case Shapes.Square: points.Add(new Square(mX, mY, r)); break;
-                case Shapes.Triangle: points.Add(new Triangle(mX, mY, r)); break;
-                default: points.Add(new Circle(mX, mY, r)); break;
+                case Shapes.Circle: points.Add(new Circle(mX, mY, radius)); break;
+                case Shapes.Square: points.Add(new Square(mX, mY, radius)); break;
+                case Shapes.Triangle: points.Add(new Triangle(mX, mY, radius)); break;
+                default: points.Add(new Circle(mX, mY, radius)); break;
             }
 
         }
@@ -67,7 +71,7 @@ namespace WindowsFormsApp3
             }
             if (!wasAnyPointTouched)
             {
-                AddPoint(e.X, e.Y, 10);
+                AddPoint(e.X, e.Y);
                 Refresh();
                 //PointsCounter.Text = points.Count.ToString();
             }
@@ -77,6 +81,7 @@ namespace WindowsFormsApp3
                 Refresh();
             }
             wasAnyPointTouched = false;
+            saveIsActual = false;
         }
 
         private void Form1_MouseMove(object sender, MouseEventArgs e)
@@ -86,8 +91,8 @@ namespace WindowsFormsApp3
                 for (int i = 0; i < points.Count(); i++)
                 {
                     points[i].Move(e.X, e.Y);
-                    Refresh();
                 }
+                Refresh();
             }
 
             for (int i = 0; i < points.Count(); i++)
@@ -106,41 +111,57 @@ namespace WindowsFormsApp3
             isFigureCarried = false;
         }
         #endregion
+        
+        private void Form1_Paint(object sender, PaintEventArgs e)
+        {
+            //e.Graphics.Clear(Color.White);
+            if (points.Count >= 3)
+            {
+                if (jarv) CreateShell_bJ(e.Graphics);
+                else CreateShell_bD(e.Graphics);
+                if (!points[points.Count - 1].IsShell) isFigureCarried = true;
+                DeleteNonShellPoints(points);
+            }
+
+            foreach (Vertex point in points) point.Draw(e.Graphics);
+        }
 
         #region Save/Load
-        private void SaveFile()
+        private void Save()
         {
             BinaryFormatter bf = new BinaryFormatter();
             FileStream fs = new FileStream(filename, FileMode.Create, FileAccess.Write);
             bf.Serialize(fs, points);
             fs.Close();
+            saveIsActual = true;
         }
 
         private void SaveFileAs()
         {
-
+            saveFileDialog = new SaveFileDialog();
+            saveFileDialog.ShowDialog();
+            filename = saveFileDialog.FileName;
+            Save();
         }
 
-        private void OpenFile()
+        private void Open()
         {
+            openFileDialog = new OpenFileDialog();
+            openFileDialog.ShowDialog();
+            filename = openFileDialog.FileName;
             BinaryFormatter bf = new BinaryFormatter();
             FileStream fs = new FileStream(filename, FileMode.Open, FileAccess.Read);
             points = (List<Vertex>)bf.Deserialize(fs);
             fs.Close();
+            saveIsActual = true;
         }
 
         private void AskToSaveFile()
         {
             if (saveIsActual) //check, if we need to save
             {
-                if (filename != null) //Save
-                {
-
-                }
-                else //Save As
-                {
-
-                }
+                if (filename != null) Save();
+                else SaveFileAs();
             }
         }
         #endregion
@@ -311,6 +332,40 @@ namespace WindowsFormsApp3
         }
         #endregion
 
+        #region Radius
+        void UpdateRadius(object Sender, RadiusEventArgs re)
+        {
+            radius = re.radius;
+            foreach (Vertex p in points)
+            {
+                p.radius = radius;
+            }
+            Refresh();
+        }
+
+        private void radiusToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Form2 F2 = new Form2();
+            F2.RadiusChanged += new RadiusChangedDelegate(UpdateRadius);
+            F2.Show();
+        }
+        #endregion
+
+        private void Shake(object source, System.Timers.ElapsedEventArgs e)
+        {
+            foreach (Vertex point in points)
+            {
+                point.X += rnd.Next(-1, 2);
+                point.Y += rnd.Next(-1, 2);
+            }
+            //Refresh();
+        }
+
+        private void RefreshTMR(object source, System.Timers.ElapsedEventArgs e)
+        {
+            Refresh();
+        }
+
         #region MenuStrip_clicks_handler
         #region FigureOptions_clicks_handler
         private void circleToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
@@ -350,20 +405,6 @@ namespace WindowsFormsApp3
         }
         #endregion
 
-        private void Form1_Paint(object sender, PaintEventArgs e)
-        {
-            //e.Graphics.Clear(Color.White);
-            if (points.Count >= 3)
-            {
-                if (jarv) CreateShell_bJ(e.Graphics);
-                else CreateShell_bD(e.Graphics);
-                if (!points[points.Count - 1].IsShell) isFigureCarried = true;
-                DeleteNonShellPoints(points);
-            }
-
-            foreach (Vertex point in points) point.Draw(e.Graphics);
-        }
-
         #region Shell_Methods_handler
         private void byDefinitionToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -385,7 +426,7 @@ namespace WindowsFormsApp3
 
         private void compareToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Random rnd = new Random();
+            /*Random rnd = new Random();
             checkPerfB = true;
             jarv = false;
             checkPerfJ = false;
@@ -419,12 +460,12 @@ namespace WindowsFormsApp3
                 timesArr_d[i] = ts.TotalSeconds;
             }
 
-            chart.DrawChart(timesArr_j, timesArr_d);
+            chart.DrawChart(timesArr_j, timesArr_d);*/
         }
 
         private void checkPerfJarvToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Random rnd = new Random();
+            /*Random rnd = new Random();
             checkPerfJ = true;
             jarv = false;
             checkPerfB = false;
@@ -445,29 +486,65 @@ namespace WindowsFormsApp3
                 TimeSpan ts = end - start;
                 timesArr[i] = ts.TotalSeconds;
             }
-            chart.DrawChart(timesArr);
+            chart.DrawChart(timesArr);*/
         }
         #endregion
-        
+
+        #region Save/Load_buttons_handler
         private void newFile_Click(object sender, EventArgs e)
         {
-            
+            AskToSaveFile();
+            points = new List<Vertex>();
         }
 
         private void openFile_Click(object sender, EventArgs e)
         {
-            
+            AskToSaveFile();
+            Open();
         }
 
         private void saveFile_Click(object sender, EventArgs e)
         {
-
+            if (filename != null) Save();
+            else SaveFileAs();
+            saveIsActual = true;
         }
 
         private void saveFileAs_Click(object sender, EventArgs e)
         {
-
+            if (filename != null) Save();
+            else SaveFileAs();
         }
         #endregion
+
+        #region Shaking_buttons_handler
+        private void startShaking_button_Click(object sender, EventArgs e)
+        {
+            //shaking = true;
+            tmr.Elapsed += Shake;
+            tmr.Elapsed += RefreshTMR;
+            tmr.AutoReset = true;
+            tmr.Start();
+        }
+
+        private void stopShaking_button_Click(object sender, EventArgs e)
+        {
+            //shaking = false;
+            tmr.Stop();
+        }
+        #endregion
+        #endregion
     }
+
+    public delegate void RadiusChangedDelegate(object sender, RadiusEventArgs re);
+
+    public class RadiusEventArgs : EventArgs
+    {
+        public int radius;
+        public RadiusEventArgs(int radius)
+        {
+            this.radius = radius;
+        }
+    }
+
 }
