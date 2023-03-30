@@ -28,6 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -51,6 +53,8 @@
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.startShaking_button = new System.Windows.Forms.Button();
             this.stopShaking_button = new System.Windows.Forms.Button();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -63,7 +67,7 @@
             this.methodToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(800, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(1041, 24);
             this.menuStrip1.TabIndex = 1;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -204,7 +208,7 @@
             // PointsCounter
             // 
             this.PointsCounter.AutoSize = true;
-            this.PointsCounter.Location = new System.Drawing.Point(753, 9);
+            this.PointsCounter.Location = new System.Drawing.Point(1016, 9);
             this.PointsCounter.Name = "PointsCounter";
             this.PointsCounter.Size = new System.Drawing.Size(13, 13);
             this.PointsCounter.TabIndex = 2;
@@ -216,29 +220,41 @@
             // 
             // startShaking_button
             // 
-            this.startShaking_button.Location = new System.Drawing.Point(0, 27);
+            this.startShaking_button.Image = ((System.Drawing.Image)(resources.GetObject("startShaking_button.Image")));
+            this.startShaking_button.ImageAlign = System.Drawing.ContentAlignment.TopLeft;
+            this.startShaking_button.Location = new System.Drawing.Point(12, 27);
             this.startShaking_button.Name = "startShaking_button";
-            this.startShaking_button.Size = new System.Drawing.Size(89, 23);
+            this.startShaking_button.Size = new System.Drawing.Size(52, 52);
             this.startShaking_button.TabIndex = 3;
-            this.startShaking_button.Text = "Start shaking";
             this.startShaking_button.UseVisualStyleBackColor = true;
             this.startShaking_button.Click += new System.EventHandler(this.startShaking_button_Click);
             // 
             // stopShaking_button
             // 
-            this.stopShaking_button.Location = new System.Drawing.Point(95, 27);
+            this.stopShaking_button.Image = ((System.Drawing.Image)(resources.GetObject("stopShaking_button.Image")));
+            this.stopShaking_button.Location = new System.Drawing.Point(70, 27);
             this.stopShaking_button.Name = "stopShaking_button";
-            this.stopShaking_button.Size = new System.Drawing.Size(89, 23);
+            this.stopShaking_button.Size = new System.Drawing.Size(52, 52);
             this.stopShaking_button.TabIndex = 4;
-            this.stopShaking_button.Text = "Stop shaking";
             this.stopShaking_button.UseVisualStyleBackColor = true;
             this.stopShaking_button.Click += new System.EventHandler(this.stopShaking_button_Click);
+            // 
+            // timer1
+            // 
+            this.timer1.Interval = 10;
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
+            // imageList1
+            // 
+            this.imageList1.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
+            this.imageList1.ImageSize = new System.Drawing.Size(16, 16);
+            this.imageList1.TransparentColor = System.Drawing.Color.Transparent;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(1041, 757);
             this.Controls.Add(this.stopShaking_button);
             this.Controls.Add(this.startShaking_button);
             this.Controls.Add(this.PointsCounter);
@@ -283,6 +299,8 @@
         private System.Windows.Forms.ToolStripMenuItem colorToolStripMenuItem;
         private System.Windows.Forms.Button startShaking_button;
         private System.Windows.Forms.Button stopShaking_button;
+        private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.ImageList imageList1;
     }
 }
 

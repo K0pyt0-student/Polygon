@@ -46,6 +46,12 @@ namespace WindowsFormsApp3
             set { isShell = value; }
         }
 
+        public bool isCarried
+        {
+            get { return IsBeingCarried; }
+            set { IsBeingCarried = value; }
+        }
+
         public abstract void Draw(Graphics g);
         public abstract void Draw(Graphics g, Color color);
         public abstract bool IsTouched(float MouseX, float MouseY);

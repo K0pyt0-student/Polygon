@@ -119,7 +119,7 @@ namespace WindowsFormsApp3
             {
                 if (jarv) CreateShell_bJ(e.Graphics);
                 else CreateShell_bD(e.Graphics);
-                if (!points[points.Count - 1].IsShell) isFigureCarried = true;
+                if (!points[points.Count - 1].IsShell && !points[points.Count-1].isCarried) isFigureCarried = true;
                 DeleteNonShellPoints(points);
             }
 
@@ -351,20 +351,18 @@ namespace WindowsFormsApp3
         }
         #endregion
 
-        private void Shake(object source, System.Timers.ElapsedEventArgs e)
+        #region Shaking
+        private void timer1_Tick(object sender, EventArgs e)
         {
+
             foreach (Vertex point in points)
             {
                 point.X += rnd.Next(-1, 2);
                 point.Y += rnd.Next(-1, 2);
             }
-            //Refresh();
-        }
-
-        private void RefreshTMR(object source, System.Timers.ElapsedEventArgs e)
-        {
             Refresh();
         }
+        #endregion
 
         #region MenuStrip_clicks_handler
         #region FigureOptions_clicks_handler
@@ -521,19 +519,19 @@ namespace WindowsFormsApp3
         private void startShaking_button_Click(object sender, EventArgs e)
         {
             //shaking = true;
-            tmr.Elapsed += Shake;
-            tmr.Elapsed += RefreshTMR;
-            tmr.AutoReset = true;
-            tmr.Start();
+            timer1.Start();
         }
 
         private void stopShaking_button_Click(object sender, EventArgs e)
         {
             //shaking = false;
-            tmr.Stop();
+            timer1.Stop();
         }
         #endregion
+
         #endregion
+
+        
     }
 
     public delegate void RadiusChangedDelegate(object sender, RadiusEventArgs re);
