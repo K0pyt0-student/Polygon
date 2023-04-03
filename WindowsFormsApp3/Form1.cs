@@ -28,15 +28,17 @@ namespace WindowsFormsApp3
         List<Vertex> points = new List<Vertex>();
         List<Vertex> chPoints = new List<Vertex>();
         Random rnd = new Random();
-        System.Timers.Timer tmr = new System.Timers.Timer(10);        bool wasAnyPointTouched = false;
+        System.Timers.Timer tmr = new System.Timers.Timer(10);
+        bool wasAnyPointTouched = false;
         bool isFigureCarried = false;
         Shapes shape = Shapes.Circle;
         bool jarv = true;
         bool checkPerfB = false;
         bool checkPerfJ = false;
-        bool saveIsActual = false;
+        bool saveIsActual = true;
         string filename;
         int radius = 10;
+        bool radiusIsBeingChanged = false;
         //bool shaking = false;
         #endregion
 
@@ -139,29 +141,44 @@ namespace WindowsFormsApp3
         private void SaveFileAs()
         {
             saveFileDialog = new SaveFileDialog();
-            saveFileDialog.ShowDialog();
-            filename = saveFileDialog.FileName;
-            Save();
+            saveFileDialog.Filter = "Polygon files: (*.bin)|*.bin";
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                filename = saveFileDialog.FileName;
+                Save();
+            }
         }
 
         private void Open()
         {
             openFileDialog = new OpenFileDialog();
-            openFileDialog.ShowDialog();
-            filename = openFileDialog.FileName;
-            BinaryFormatter bf = new BinaryFormatter();
-            FileStream fs = new FileStream(filename, FileMode.Open, FileAccess.Read);
-            points = (List<Vertex>)bf.Deserialize(fs);
-            fs.Close();
-            saveIsActual = true;
+            openFileDialog.Filter = "Polygon files: (*.bin)|*.bin";
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                filename = openFileDialog.FileName;
+
+                BinaryFormatter bf = new BinaryFormatter();
+                FileStream fs = new FileStream(filename, FileMode.Open, FileAccess.Read);
+                points = (List<Vertex>)bf.Deserialize(fs);
+                fs.Close();
+                saveIsActual = true;
+            }
+        }
+
+        private void Save_handling()
+        {
+            if (!saveIsActual) //check, if we need to save
+            {
+                if (filename != null) Save();
+                else SaveFileAs();
+            }
         }
 
         private void AskToSaveFile()
         {
-            if (saveIsActual) //check, if we need to save
+            if (MessageBox.Show("Save file?", "Current file is not saved", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
-                if (filename != null) Save();
-                else SaveFileAs();
+                Save_handling();
             }
         }
         #endregion
@@ -335,6 +352,11 @@ namespace WindowsFormsApp3
         #region Radius
         void UpdateRadius(object Sender, RadiusEventArgs re)
         {
+            if (re.radius == -1)
+            {
+                radiusIsBeingChanged = false;
+                return;
+            }
             radius = re.radius;
             foreach (Vertex p in points)
             {
@@ -493,25 +515,29 @@ namespace WindowsFormsApp3
         {
             AskToSaveFile();
             points = new List<Vertex>();
+            Refresh();
         }
 
         private void openFile_Click(object sender, EventArgs e)
         {
             AskToSaveFile();
             Open();
+            Refresh();
         }
 
         private void saveFile_Click(object sender, EventArgs e)
         {
-            if (filename != null) Save();
-            else SaveFileAs();
-            saveIsActual = true;
+            Save_handling();
         }
 
         private void saveFileAs_Click(object sender, EventArgs e)
         {
-            if (filename != null) Save();
-            else SaveFileAs();
+            SaveFileAs();
+        }
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            AskToSaveFile();
+
         }
         #endregion
 
@@ -530,8 +556,6 @@ namespace WindowsFormsApp3
         #endregion
 
         #endregion
-
-        
     }
 
     public delegate void RadiusChangedDelegate(object sender, RadiusEventArgs re);

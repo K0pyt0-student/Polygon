@@ -86,6 +86,7 @@ namespace WindowsFormsApp3
         }
     }
 
+    [Serializable]
     internal class Circle : Vertex
     {
         public Circle(float x, float y, int r) : base(x, y, r) { }
@@ -110,6 +111,7 @@ namespace WindowsFormsApp3
         }
     }
 
+    [Serializable]
     internal class Square : Vertex
     {
         public Square(int x, int y, int r) : base(x, y, r) { }
@@ -134,6 +136,7 @@ namespace WindowsFormsApp3
         }
     }
 
+    [Serializable]
     internal class Triangle : Vertex
     {
         private PointF[] points = new PointF[3];
@@ -155,12 +158,18 @@ namespace WindowsFormsApp3
         public override void Draw(Graphics g)
         {
             Brush brush = new SolidBrush(Color.Black);
+            points[0] = new PointF(Convert.ToInt32(x - Math.Sqrt(3) * r), y + r);
+            points[1] = new PointF(Convert.ToInt32(x + Math.Sqrt(3) * r), y + r);
+            points[2] = new PointF(x, y - r);
             g.FillPolygon(brush, points);
         }
 
         public override void Draw(Graphics g, Color color)
         {
             Brush brush = new SolidBrush(color);
+            points[0] = new PointF(Convert.ToInt32(x - Math.Sqrt(3) * r), y + r);
+            points[1] = new PointF(Convert.ToInt32(x + Math.Sqrt(3) * r), y + r);
+            points[2] = new PointF(x, y - r);
             g.FillPolygon(brush, points);
         }
 
