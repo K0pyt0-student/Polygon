@@ -51,8 +51,6 @@ namespace WindowsFormsApp3
             get { return IsBeingCarried; }
             set { IsBeingCarried = value; }
         }
-
-        public abstract void Draw(Graphics g);
         public abstract void Draw(Graphics g, Color color);
         public abstract bool IsTouched(float MouseX, float MouseY);
 
@@ -86,15 +84,10 @@ namespace WindowsFormsApp3
         }
     }
 
+    [Serializable]
     internal class Circle : Vertex
     {
         public Circle(float x, float y, int r) : base(x, y, r) { }
-
-        public override void Draw(Graphics g)
-        {
-            Brush brush = new SolidBrush(Color.Black);
-            g.FillEllipse(brush, x - r, y - r, 2 * r, 2 * r);
-        }
 
         public override void Draw(Graphics g, Color color)
         {
@@ -110,15 +103,10 @@ namespace WindowsFormsApp3
         }
     }
 
+    [Serializable]
     internal class Square : Vertex
     {
         public Square(int x, int y, int r) : base(x, y, r) { }
-
-        public override void Draw(Graphics g)
-        {
-            Brush brush = new SolidBrush(Color.Black);
-            g.FillRectangle(brush, x - r, y - r, 2 * r, 2 * r);
-        }
 
         public override void Draw(Graphics g, Color color)
         {
@@ -134,6 +122,7 @@ namespace WindowsFormsApp3
         }
     }
 
+    [Serializable]
     internal class Triangle : Vertex
     {
         private PointF[] points = new PointF[3];
@@ -152,15 +141,12 @@ namespace WindowsFormsApp3
             points[2] = new PointF(x, y - r);
         }
 
-        public override void Draw(Graphics g)
-        {
-            Brush brush = new SolidBrush(Color.Black);
-            g.FillPolygon(brush, points);
-        }
-
         public override void Draw(Graphics g, Color color)
         {
             Brush brush = new SolidBrush(color);
+            points[0] = new PointF(Convert.ToInt32(x - Math.Sqrt(3) * r), y + r);
+            points[1] = new PointF(Convert.ToInt32(x + Math.Sqrt(3) * r), y + r);
+            points[2] = new PointF(x, y - r);
             g.FillPolygon(brush, points);
         }
 

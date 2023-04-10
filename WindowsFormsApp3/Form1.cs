@@ -26,18 +26,78 @@ namespace WindowsFormsApp3
 
         //Vertex point = new Vertex(100, 100, 10, 0);
         List<Vertex> points = new List<Vertex>();
-        List<Vertex> chPoints = new List<Vertex>();
+        List<Vertex> initPoints = new List<Vertex>();
+        List<Action> actions = new List<Action>();
+        int actionID = -1;
         Random rnd = new Random();
-        System.Timers.Timer tmr = new System.Timers.Timer(10);        bool wasAnyPointTouched = false;
+        System.Timers.Timer tmr = new System.Timers.Timer(10);
+        float initX = -1;
+        float initY = -1;
+        bool wasAnyPointTouched = false;
         bool isFigureCarried = false;
         Shapes shape = Shapes.Circle;
+        Color color = Color.Black;
         bool jarv = true;
         bool checkPerfB = false;
         bool checkPerfJ = false;
-        bool saveIsActual = false;
+        bool saveIsActual = true;
         string filename;
         int radius = 10;
-        //bool shaking = false;
+        bool radiusIsBeingChanged = false;
+        #endregion
+
+        private void Form1_Paint(object sender, PaintEventArgs e)
+        {
+            //e.Graphics.Clear(Color.White);
+            PointsCounter.Text = points.Count.ToString();
+            if (points.Count >= 3)
+            {
+                if (jarv) CreateShell_bJ(e.Graphics);
+                else CreateShell_bD(e.Graphics);
+                if (!points[points.Count - 1].IsShell && !wasAnyPointTouched) isFigureCarried = true;
+                DeleteNonShellPoints(points);
+            }
+            foreach (Vertex point in points) point.Draw(e.Graphics, color);
+            saveIsActual = false;
+        }
+
+        #region Undo/Redo
+        private void AddAction(Action action) 
+        {
+            if (actionID != actions.Count - 1)
+            {
+                for(int i = actionID + 1; i < actions.Count; i++)
+                {
+                    actions.RemoveAt(actionID);
+                }
+            }
+            actionID++;
+            ActionsCounter.Text = actionID.ToString();
+            actions.Add(action);
+        }
+
+        private void Undo_button_Click(object sender, EventArgs e)
+        {
+            if (actionID != -1)
+            {
+                actions[actionID].Undo(ref points);
+                actionID--;
+                ActionsCounter.Text = actionID.ToString();
+            }
+            Refresh();
+        }
+
+        private void Redo_button_Click(object sender, EventArgs e)
+        {
+            if(actionID != actions.Count - 1)
+            {
+                actionID++;
+                actions[actionID].Redo(ref points);
+                ActionsCounter.Text = actionID.ToString();
+                Refresh();
+            }
+            Refresh();
+        }
         #endregion
 
         #region Canvas_clicks_handler
@@ -49,18 +109,28 @@ namespace WindowsFormsApp3
                 case Shapes.Square: points.Add(new Square(mX, mY, radius)); break;
                 case Shapes.Triangle: points.Add(new Triangle(mX, mY, radius)); break;
                 default: points.Add(new Circle(mX, mY, radius)); break;
-            }
 
+                    /*case Shapes.Circle: actions.Add(new AddPoint(new Circle(mX, mY, radius), ref points)); break;
+                    case Shapes.Square: actions.Add(new AddPoint(new Square(mX, mY, radius), ref points)); break;
+                    case Shapes.Triangle: actions.Add(new AddPoint(new Triangle(mX, mY, radius), ref points)); break;
+                    default: actions.Add(new AddPoint(new Circle(mX, mY, radius), ref points)); break;*/
+            }
+            AddAction(new AddPoint(points[points.Count - 1]));
         }
 
         private void Form1_MouseDown(object sender, MouseEventArgs e)
         {
             int hitnum = -1;
+            PointsCounter.Text = "MD";
+            wasAnyPointTouched = false;
             foreach (Vertex point in points)
             {
                 if (e.Button == MouseButtons.Left && point.IsTouched(e.X, e.Y))
                 {
                     point.Carried = true;
+                    initX = e.X;
+                    initY = e.Y;
+                    initPoints = points;
                     wasAnyPointTouched = true;
                 }
                 else if (point.IsTouched(e.X, e.Y))
@@ -69,63 +139,74 @@ namespace WindowsFormsApp3
                     wasAnyPointTouched = true;
                 }
             }
+
             if (!wasAnyPointTouched)
             {
                 AddPoint(e.X, e.Y);
                 Refresh();
-                //PointsCounter.Text = points.Count.ToString();
             }
+
             if (hitnum != -1)
             {
+                AddAction(new DeletePoint(points[hitnum]));
                 points.RemoveAt(hitnum);
                 Refresh();
             }
-            wasAnyPointTouched = false;
-            saveIsActual = false;
         }
 
         private void Form1_MouseMove(object sender, MouseEventArgs e)
         {
-            if (isFigureCarried)
+            if (e.Button == MouseButtons.Left)
             {
+                if (isFigureCarried)
+                {
+                    foreach (Vertex p in points) p.Move(e.X, e.Y);
+                    if (initX == -1)
+                    {
+                        initX = e.X;
+                        initY = e.Y;
+                    }
+                    Refresh();
+                }
+
                 for (int i = 0; i < points.Count(); i++)
                 {
-                    points[i].Move(e.X, e.Y);
-                }
-                Refresh();
-            }
-
-            for (int i = 0; i < points.Count(); i++)
-            {
-                if (e.Button == MouseButtons.Left && points[i].Carried)
-                {
-                    points[i].Move(e.X, e.Y);
-                    Refresh();
+                    if (points[i].Carried)
+                    {
+                        points[i].Move(e.X, e.Y);
+                        Refresh();
+                    }
                 }
             }
         }
 
         private void Form1_MouseUp(object sender, MouseEventArgs e)
         {
-            foreach (Vertex point in points) point.Carried = false;
-            isFigureCarried = false;
+            if (wasAnyPointTouched) 
+            { 
+                List<Vertex> movedPoints = new List<Vertex>();
+                foreach (Vertex point in points)
+                {
+                    if (point.Carried)
+                    {
+                        movedPoints.Add(point);
+                        point.Carried = false;
+                    }
+                }
+                AddAction(new MovePoints(movedPoints, initPoints.Except(points).ToArray(), initX, initY, e.X, e.Y));
+                initPoints = null;
+            }
+            
+            if (isFigureCarried)
+            {
+                AddAction(new MovePolygon(initX, initY, e.X, e.Y));
+                isFigureCarried = false;
+            }
+            initX = -1;
+            initY = -1;
         }
         #endregion
         
-        private void Form1_Paint(object sender, PaintEventArgs e)
-        {
-            //e.Graphics.Clear(Color.White);
-            if (points.Count >= 3)
-            {
-                if (jarv) CreateShell_bJ(e.Graphics);
-                else CreateShell_bD(e.Graphics);
-                if (!points[points.Count - 1].IsShell && !points[points.Count-1].isCarried) isFigureCarried = true;
-                DeleteNonShellPoints(points);
-            }
-
-            foreach (Vertex point in points) point.Draw(e.Graphics);
-        }
-
         #region Save/Load
         private void Save()
         {
@@ -139,29 +220,44 @@ namespace WindowsFormsApp3
         private void SaveFileAs()
         {
             saveFileDialog = new SaveFileDialog();
-            saveFileDialog.ShowDialog();
-            filename = saveFileDialog.FileName;
-            Save();
+            saveFileDialog.Filter = "Polygon files: (*.bin)|*.bin";
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                filename = saveFileDialog.FileName;
+                Save();
+            }
         }
 
         private void Open()
         {
             openFileDialog = new OpenFileDialog();
-            openFileDialog.ShowDialog();
-            filename = openFileDialog.FileName;
-            BinaryFormatter bf = new BinaryFormatter();
-            FileStream fs = new FileStream(filename, FileMode.Open, FileAccess.Read);
-            points = (List<Vertex>)bf.Deserialize(fs);
-            fs.Close();
-            saveIsActual = true;
+            openFileDialog.Filter = "Polygon files: (*.bin)|*.bin";
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                filename = openFileDialog.FileName;
+
+                BinaryFormatter bf = new BinaryFormatter();
+                FileStream fs = new FileStream(filename, FileMode.Open, FileAccess.Read);
+                points = (List<Vertex>)bf.Deserialize(fs);
+                fs.Close();
+                saveIsActual = true;
+            }
+        }
+
+        private void Save_handling()
+        {
+            if (!saveIsActual) //check, if we need to save
+            {
+                if (filename != null) Save();
+                else SaveFileAs();
+            }
         }
 
         private void AskToSaveFile()
         {
-            if (saveIsActual) //check, if we need to save
+            if (MessageBox.Show("Save file?", "Current file is not saved", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
-                if (filename != null) Save();
-                else SaveFileAs();
+                Save_handling();
             }
         }
         #endregion
@@ -244,7 +340,7 @@ namespace WindowsFormsApp3
         #region Shell_by_Jarvis
         private void CreateShell_bJ(Graphics g)
         {
-            PointsCounter.Text = "j";
+            //PointsCounter.Text = "j";
             Vertex startP = FindFirstPoint();
             points[points.IndexOf(startP)].IsShell = true;
 
@@ -335,6 +431,11 @@ namespace WindowsFormsApp3
         #region Radius
         void UpdateRadius(object Sender, RadiusEventArgs re)
         {
+            if (re.radius == -1)
+            {
+                radiusIsBeingChanged = false;
+                return;
+            }
             radius = re.radius;
             foreach (Vertex p in points)
             {
@@ -493,25 +594,24 @@ namespace WindowsFormsApp3
         {
             AskToSaveFile();
             points = new List<Vertex>();
+            Refresh();
         }
 
         private void openFile_Click(object sender, EventArgs e)
         {
             AskToSaveFile();
             Open();
+            Refresh();
         }
 
         private void saveFile_Click(object sender, EventArgs e)
         {
-            if (filename != null) Save();
-            else SaveFileAs();
-            saveIsActual = true;
+            Save_handling();
         }
 
         private void saveFileAs_Click(object sender, EventArgs e)
         {
-            if (filename != null) Save();
-            else SaveFileAs();
+            SaveFileAs();
         }
         #endregion
 
@@ -529,9 +629,18 @@ namespace WindowsFormsApp3
         }
         #endregion
 
-        #endregion
-
         
+
+        private void colorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            colorDialog = new ColorDialog();
+            if (colorDialog.ShowDialog() == DialogResult.OK)
+            {
+                color = colorDialog.Color;
+                Refresh();
+            }
+        }
+        #endregion
     }
 
     public delegate void RadiusChangedDelegate(object sender, RadiusEventArgs re);

@@ -55,6 +55,10 @@
             this.stopShaking_button = new System.Windows.Forms.Button();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
+            this.colorDialog = new System.Windows.Forms.ColorDialog();
+            this.Redo_button = new System.Windows.Forms.Button();
+            this.Undo_button = new System.Windows.Forms.Button();
+            this.ActionsCounter = new System.Windows.Forms.Label();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -165,6 +169,7 @@
             this.colorToolStripMenuItem.Name = "colorToolStripMenuItem";
             this.colorToolStripMenuItem.Size = new System.Drawing.Size(109, 22);
             this.colorToolStripMenuItem.Text = "Color";
+            this.colorToolStripMenuItem.Click += new System.EventHandler(this.colorToolStripMenuItem_Click);
             // 
             // methodToolStripMenuItem
             // 
@@ -250,11 +255,44 @@
             this.imageList1.ImageSize = new System.Drawing.Size(16, 16);
             this.imageList1.TransparentColor = System.Drawing.Color.Transparent;
             // 
+            // Redo_button
+            // 
+            this.Redo_button.Image = ((System.Drawing.Image)(resources.GetObject("Redo_button.Image")));
+            this.Redo_button.Location = new System.Drawing.Point(208, 27);
+            this.Redo_button.Name = "Redo_button";
+            this.Redo_button.Size = new System.Drawing.Size(52, 52);
+            this.Redo_button.TabIndex = 6;
+            this.Redo_button.UseVisualStyleBackColor = true;
+            this.Redo_button.Click += new System.EventHandler(this.Redo_button_Click);
+            // 
+            // Undo_button
+            // 
+            this.Undo_button.Image = ((System.Drawing.Image)(resources.GetObject("Undo_button.Image")));
+            this.Undo_button.ImageAlign = System.Drawing.ContentAlignment.TopLeft;
+            this.Undo_button.Location = new System.Drawing.Point(150, 27);
+            this.Undo_button.Name = "Undo_button";
+            this.Undo_button.Size = new System.Drawing.Size(52, 52);
+            this.Undo_button.TabIndex = 5;
+            this.Undo_button.UseVisualStyleBackColor = true;
+            this.Undo_button.Click += new System.EventHandler(this.Undo_button_Click);
+            // 
+            // ActionsCounter
+            // 
+            this.ActionsCounter.AutoSize = true;
+            this.ActionsCounter.Location = new System.Drawing.Point(942, 8);
+            this.ActionsCounter.Name = "ActionsCounter";
+            this.ActionsCounter.Size = new System.Drawing.Size(13, 13);
+            this.ActionsCounter.TabIndex = 7;
+            this.ActionsCounter.Text = "0";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1041, 757);
+            this.Controls.Add(this.ActionsCounter);
+            this.Controls.Add(this.Redo_button);
+            this.Controls.Add(this.Undo_button);
             this.Controls.Add(this.stopShaking_button);
             this.Controls.Add(this.startShaking_button);
             this.Controls.Add(this.PointsCounter);
@@ -301,6 +339,10 @@
         private System.Windows.Forms.Button stopShaking_button;
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.ImageList imageList1;
+        private System.Windows.Forms.ColorDialog colorDialog;
+        private System.Windows.Forms.Button Redo_button;
+        private System.Windows.Forms.Button Undo_button;
+        private System.Windows.Forms.Label ActionsCounter;
     }
 }
 

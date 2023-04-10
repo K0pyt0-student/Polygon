@@ -24,5 +24,10 @@ namespace WindowsFormsApp3
             if (RadiusChanged != null)
                 RadiusChanged(this, new RadiusEventArgs(trackBar1.Value));
         }
+
+        private void Form2_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            RadiusChanged(this, new RadiusEventArgs(-1));
+        }
     }
 }
