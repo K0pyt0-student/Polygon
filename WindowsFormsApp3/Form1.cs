@@ -26,7 +26,7 @@ namespace WindowsFormsApp3
 
         //Vertex point = new Vertex(100, 100, 10, 0);
         List<Vertex> points = new List<Vertex>();
-        List<Vertex> initPoints = new List<Vertex>();
+        Vertex[] initPoints;
         List<Action> actions = new List<Action>();
         int actionID = -1;
         Random rnd = new Random();
@@ -42,8 +42,10 @@ namespace WindowsFormsApp3
         bool checkPerfJ = false;
         bool saveIsActual = true;
         string filename;
+        int initRadius;
         int radius = 10;
         bool radiusIsBeingChanged = false;
+        Form2 F2;
         #endregion
 
         private void Form1_Paint(object sender, PaintEventArgs e)
@@ -64,23 +66,26 @@ namespace WindowsFormsApp3
         #region Undo/Redo
         private void AddAction(Action action) 
         {
-            if (actionID != actions.Count - 1)
+            if (!tmr.Enabled || action.IsShaking )
             {
-                for(int i = actionID + 1; i < actions.Count; i++)
+                if (actionID != actions.Count - 1)
                 {
-                    actions.RemoveAt(actionID);
+                    for (int i = actionID + 1; i < actions.Count; i++)
+                    {
+                        actions.RemoveAt(actionID);
+                    }
                 }
+                actionID++;
+                ActionsCounter.Text = actionID.ToString();
+                actions.Add(action);
             }
-            actionID++;
-            ActionsCounter.Text = actionID.ToString();
-            actions.Add(action);
         }
 
         private void Undo_button_Click(object sender, EventArgs e)
         {
             if (actionID != -1)
             {
-                actions[actionID].Undo(ref points);
+                actions[actionID].Undo(ref points, ref radius, ref color);
                 actionID--;
                 ActionsCounter.Text = actionID.ToString();
             }
@@ -92,14 +97,14 @@ namespace WindowsFormsApp3
             if(actionID != actions.Count - 1)
             {
                 actionID++;
-                actions[actionID].Redo(ref points);
+                actions[actionID].Redo(ref points, ref radius, ref color);
                 ActionsCounter.Text = actionID.ToString();
                 Refresh();
             }
             Refresh();
         }
 
-        private Vertex[] GetDeletedPoints(List<Vertex> iPs, List<Vertex> rPs)
+        private Vertex[] GetDeletedPoints(Vertex[] iPs, List<Vertex> rPs)
         {
             List<Vertex> result = new List<Vertex>();
             foreach(Vertex iP in iPs)
@@ -119,9 +124,6 @@ namespace WindowsFormsApp3
             return ans;
         }
         #endregion
-
-
-
 
         #region Canvas_clicks_handler
         private void AddPoint(int mX, int mY)
@@ -147,7 +149,7 @@ namespace WindowsFormsApp3
                     point.Carried = true;
                     initX = e.X;
                     initY = e.Y;
-                    initPoints = points;
+                    initPoints = points.ToArray();
                     wasAnyPointTouched = true;
                 }
                 else if (point.IsTouched(e.X, e.Y))
@@ -160,10 +162,10 @@ namespace WindowsFormsApp3
             if (!wasAnyPointTouched)
             {
                 AddPoint(e.X, e.Y);
-                initPoints = points;
+                initPoints = points.ToArray();
                 Refresh();
                 Vertex[] killedPoints = GetDeletedPoints(initPoints, points);
-                DeletedPointsCounter.Text = killedPoints.Length.ToString();
+                DeletedPointsCounter.Text = initPoints.Length.ToString();
                 AddAction(new AddPoint(points[points.Count - 1], GetDeletedPoints(initPoints, points)));
             }
 
@@ -217,9 +219,9 @@ namespace WindowsFormsApp3
             if(carried)
             {
                 Vertex[] killedPoints = GetDeletedPoints(initPoints, points);
-                DeletedPointsCounter.Text = killedPoints.Length.ToString();
+                DeletedPointsCounter.Text = initPoints.Length.ToString();
                 AddAction(new MovePoints(movedPoints, GetDeletedPoints(initPoints, points), initX, initY, e.X, e.Y));
-                initPoints = new List<Vertex>();
+                initPoints = new Vertex[0];
             }
             
             if (isFigureCarried)
@@ -459,8 +461,10 @@ namespace WindowsFormsApp3
             if (re.radius == -1)
             {
                 radiusIsBeingChanged = false;
+                AddAction(new ChangeRadius(initRadius, radius));
                 return;
             }
+
             radius = re.radius;
             foreach (Vertex p in points)
             {
@@ -471,9 +475,19 @@ namespace WindowsFormsApp3
 
         private void radiusToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Form2 F2 = new Form2();
-            F2.RadiusChanged += new RadiusChangedDelegate(UpdateRadius);
-            F2.Show();
+            if (!radiusIsBeingChanged)
+            {
+                F2 = new Form2();
+                F2.RadiusChanged += new RadiusChangedDelegate(UpdateRadius);
+
+                initRadius = radius;
+                radiusIsBeingChanged = true;
+                F2.Show();
+            }
+            else
+            {
+                F2.BringToFront();
+            }
         }
         #endregion
 
@@ -645,22 +659,23 @@ namespace WindowsFormsApp3
         {
             //shaking = true;
             timer1.Start();
+            initPoints = points.ToArray();
         }
 
         private void stopShaking_button_Click(object sender, EventArgs e)
         {
             //shaking = false;
             timer1.Stop();
+            AddAction(new Shaking(initPoints, points.ToArray()));
         }
         #endregion
-
-        
 
         private void colorToolStripMenuItem_Click(object sender, EventArgs e)
         {
             colorDialog = new ColorDialog();
             if (colorDialog.ShowDialog() == DialogResult.OK)
             {
+                AddAction(new ChangeColor(color, colorDialog.Color));
                 color = colorDialog.Color;
                 Refresh();
             }
