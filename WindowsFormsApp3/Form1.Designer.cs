@@ -59,6 +59,7 @@
             this.Redo_button = new System.Windows.Forms.Button();
             this.Undo_button = new System.Windows.Forms.Button();
             this.ActionsCounter = new System.Windows.Forms.Label();
+            this.DeletedPointsCounter = new System.Windows.Forms.Label();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -279,17 +280,26 @@
             // ActionsCounter
             // 
             this.ActionsCounter.AutoSize = true;
-            this.ActionsCounter.Location = new System.Drawing.Point(942, 8);
+            this.ActionsCounter.Location = new System.Drawing.Point(947, 10);
             this.ActionsCounter.Name = "ActionsCounter";
             this.ActionsCounter.Size = new System.Drawing.Size(13, 13);
             this.ActionsCounter.TabIndex = 7;
             this.ActionsCounter.Text = "0";
+            // 
+            // DeletedPointsCounter
+            // 
+            this.DeletedPointsCounter.AutoSize = true;
+            this.DeletedPointsCounter.Location = new System.Drawing.Point(882, 10);
+            this.DeletedPointsCounter.Name = "DeletedPointsCounter";
+            this.DeletedPointsCounter.Size = new System.Drawing.Size(0, 13);
+            this.DeletedPointsCounter.TabIndex = 8;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1041, 757);
+            this.Controls.Add(this.DeletedPointsCounter);
             this.Controls.Add(this.ActionsCounter);
             this.Controls.Add(this.Redo_button);
             this.Controls.Add(this.Undo_button);
@@ -300,8 +310,7 @@
             this.DoubleBuffered = true;
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
-            this.Text = "Чей-то polygon";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
+            this.Text = "Form1";
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.Form1_Paint);
             this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseDown);
             this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseMove);
@@ -344,6 +353,7 @@
         private System.Windows.Forms.Button Redo_button;
         private System.Windows.Forms.Button Undo_button;
         private System.Windows.Forms.Label ActionsCounter;
+        private System.Windows.Forms.Label DeletedPointsCounter;
     }
 }
 

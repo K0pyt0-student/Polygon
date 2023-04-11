@@ -168,7 +168,7 @@
   <data name="Redo_button.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAAC0AAAAtCAYAAAA6GuKaAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAL
-        EQAACxEBf2RfkQAAAlBJREFUaEPtmCGvwjAURt8fQ2PRaDQai0ajsWg0Fix6v2YvZ0mTm5uvXdd2Yy95
+        DwAACw8BkvkDpQAAAlBJREFUaEPtmCGvwjAURt8fQ2PRaDQai0ajsWg0Fix6v2YvZ0mTm5uvXdd2Yy95
         4iSQlfXs7mt3x0/Xdf1fYxbp6/XaXy4XeawFs0gjvNls+t1u199uNzmmhlmlA4fDoX+9XnJsCYtIB06n
         UxP5JtKPx6M/n8/98XgcIrHdbqU0cJzMq/PkUiz9+XyGiqYEU9TkfbJ0rWwAae6QmmOMSdLv93uYTEnA
         fr8fcsvCU8eBi+Wi1flzyZZ+Pp+yuiGj3IEwNrYQyb0dV0qWtBLmeyyTXprKl0ZBMSpNJLzw2L4bpLkL
@@ -184,7 +184,7 @@
   <data name="Undo_button.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAAC0AAAAtCAYAAAA6GuKaAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAL
-        EQAACxEBf2RfkQAAAktJREFUaEPtmS2PAkEMhu+PobFoNBoLFo1GY9FoLFj0/pq5PCRzKU1nmE+YSxBv
+        DwAACw8BkvkDpQAAAktJREFUaEPtmS2PAkEMhu+PobFoNBoLFo1GY9FoLFj0/pq5PCRzKU1nmE+YSxBv
         cmS7M89233a7ez/TNLn/pi7Q9/vd7fd7dzgczOO1ag59Op3cYrFws9nsAW7F1KoZ9Pl8dqvV6gHrNSw0
         Vtjtdk+wQ0MDNZ/PTWDEMazCHeDCuBvWOrkqgmZz79tccd52u3XX69VcO0VF0MfjsRhaqtQ+VfagpcXg
         scV6vXbL5dI8jjg/N+vVhXi73R632wKSmSQudIfw/uVyeVo3pmpoL6BSW54FnwPeDNpLAsU8y0Vq2wCe

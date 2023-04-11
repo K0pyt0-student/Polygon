@@ -11,6 +11,15 @@ namespace WindowsFormsApp3
     {
         public abstract void Undo(ref List<Vertex> points);
         public abstract void Redo(ref List<Vertex> points);
+        protected static int GetPointID(List<Vertex> points, Vertex point)
+        {
+            int ans = -1;
+            for (int i = 0; i < points.Count; i++) 
+            { 
+                if (points[i].X == point.X && points[i].Y == point.Y) { ans = i; break; }
+            }
+            return ans;
+        }
     }
 
     internal class MovePoints : Action
@@ -33,7 +42,7 @@ namespace WindowsFormsApp3
         {
             foreach(Vertex p in movedPoints)
             { 
-                int id = points.IndexOf(p);
+                int id = GetPointID(points, p);
                 points[id].X -= shiftX;
                 points[id].Y -= shiftY;
             }
@@ -47,13 +56,13 @@ namespace WindowsFormsApp3
         {
             foreach (Vertex p in movedPoints)
             {
-                int id = points.IndexOf(p);
+                int id = GetPointID(points, p);
                 points[id].X += shiftX;
                 points[id].Y += shiftY;
             }
             foreach (Vertex p in killedPoints)
             {
-                points.Remove(p);
+                points.RemoveAt(GetPointID(points, p));
             }
         }
     }
@@ -100,26 +109,36 @@ namespace WindowsFormsApp3
 
         public override void Redo(ref List<Vertex> points)
         {
-            points.Remove(point);
+            points.RemoveAt(GetPointID(points, point));
         }
     }
 
     internal class AddPoint : Action
     {
         Vertex point;
-        public AddPoint(Vertex point)
+        Vertex[] killedPoints; 
+        public AddPoint(Vertex point, Vertex[] Kpoints)
         {
+            killedPoints = Kpoints;
             this.point = point;
         }
 
         public override void Undo(ref List<Vertex> points)
         {
             points.Remove(point);
+            foreach (Vertex p in killedPoints)
+            {
+                points.Add(p);
+            }
         }
 
         public override void Redo(ref List<Vertex> points)
         {
             points.Add(point);
+            foreach (Vertex p in killedPoints)
+            {
+                points.RemoveAt(GetPointID(points, p));
+            }
         }
     }
 }

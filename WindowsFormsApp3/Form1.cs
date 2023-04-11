@@ -98,7 +98,30 @@ namespace WindowsFormsApp3
             }
             Refresh();
         }
+
+        private Vertex[] GetDeletedPoints(List<Vertex> iPs, List<Vertex> rPs)
+        {
+            List<Vertex> result = new List<Vertex>();
+            foreach(Vertex iP in iPs)
+            {
+                if (GetPointID(rPs, iP) == -1) result.Add(iP);
+            }
+            return result.ToArray();
+        }
+
+        private static int GetPointID(List<Vertex> points, Vertex point)
+        {
+            int ans = -1;
+            for (int i = 0; i < points.Count; i++)
+            {
+                if (points[i].X == point.X && points[i].Y == point.Y) { ans = i; break; }
+            }
+            return ans;
+        }
         #endregion
+
+
+
 
         #region Canvas_clicks_handler
         private void AddPoint(int mX, int mY)
@@ -109,13 +132,7 @@ namespace WindowsFormsApp3
                 case Shapes.Square: points.Add(new Square(mX, mY, radius)); break;
                 case Shapes.Triangle: points.Add(new Triangle(mX, mY, radius)); break;
                 default: points.Add(new Circle(mX, mY, radius)); break;
-
-                    /*case Shapes.Circle: actions.Add(new AddPoint(new Circle(mX, mY, radius), ref points)); break;
-                    case Shapes.Square: actions.Add(new AddPoint(new Square(mX, mY, radius), ref points)); break;
-                    case Shapes.Triangle: actions.Add(new AddPoint(new Triangle(mX, mY, radius), ref points)); break;
-                    default: actions.Add(new AddPoint(new Circle(mX, mY, radius), ref points)); break;*/
             }
-            AddAction(new AddPoint(points[points.Count - 1]));
         }
 
         private void Form1_MouseDown(object sender, MouseEventArgs e)
@@ -143,7 +160,11 @@ namespace WindowsFormsApp3
             if (!wasAnyPointTouched)
             {
                 AddPoint(e.X, e.Y);
+                initPoints = points;
                 Refresh();
+                Vertex[] killedPoints = GetDeletedPoints(initPoints, points);
+                DeletedPointsCounter.Text = killedPoints.Length.ToString();
+                AddAction(new AddPoint(points[points.Count - 1], GetDeletedPoints(initPoints, points)));
             }
 
             if (hitnum != -1)
@@ -182,19 +203,23 @@ namespace WindowsFormsApp3
 
         private void Form1_MouseUp(object sender, MouseEventArgs e)
         {
-            if (wasAnyPointTouched) 
-            { 
-                List<Vertex> movedPoints = new List<Vertex>();
-                foreach (Vertex point in points)
+            List<Vertex> movedPoints = new List<Vertex>();
+            bool carried = false;
+            foreach (Vertex point in points)
+            {
+                if (point.Carried)
                 {
-                    if (point.Carried)
-                    {
-                        movedPoints.Add(point);
-                        point.Carried = false;
-                    }
+                    movedPoints.Add(point);
+                    point.Carried = false;
+                    carried = true;
                 }
-                AddAction(new MovePoints(movedPoints, initPoints.Except(points).ToArray(), initX, initY, e.X, e.Y));
-                initPoints = null;
+            }
+            if(carried)
+            {
+                Vertex[] killedPoints = GetDeletedPoints(initPoints, points);
+                DeletedPointsCounter.Text = killedPoints.Length.ToString();
+                AddAction(new MovePoints(movedPoints, GetDeletedPoints(initPoints, points), initX, initY, e.X, e.Y));
+                initPoints = new List<Vertex>();
             }
             
             if (isFigureCarried)
