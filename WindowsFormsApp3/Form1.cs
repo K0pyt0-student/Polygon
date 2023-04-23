@@ -26,9 +26,9 @@ namespace WindowsFormsApp3
 
         //Vertex point = new Vertex(100, 100, 10, 0);
         List<Vertex> points = new List<Vertex>();
-        Vertex[] initPoints;
-        List<Action> actions = new List<Action>();
-        int actionID = -1;
+        Vertex[] initPoints, shakIPoints;
+        Stack<Action> actions = new Stack<Action>();
+        Stack<Action> undoneActions = new Stack<Action>();
         Random rnd = new Random();
         System.Timers.Timer tmr = new System.Timers.Timer(10);
         float initX = -1;
@@ -66,42 +66,31 @@ namespace WindowsFormsApp3
         #region Undo/Redo
         private void AddAction(Action action) 
         {
-            if (!tmr.Enabled || action.IsShaking )
+            if (!tmr.Enabled || action.IsShaking)
             {
-                if (actionID != actions.Count - 1)
-                {
-                    for (int i = actionID + 1; i < actions.Count; i++)
-                    {
-                        actions.RemoveAt(actionID);
-                    }
-                }
-                actionID++;
-                ActionsCounter.Text = actionID.ToString();
-                actions.Add(action);
+                undoneActions = new Stack<Action>();
+                actions.Push(action);
             }
         }
 
         private void Undo_button_Click(object sender, EventArgs e)
         {
-            if (actionID != -1)
+            if (actions.Count > 0)
             {
-                actions[actionID].Undo(ref points, ref radius, ref color);
-                actionID--;
-                ActionsCounter.Text = actionID.ToString();
+                actions.Peek().Undo(ref points, ref radius, ref color);
+                undoneActions.Push(actions.Pop());
+                Refresh();
             }
-            Refresh();
         }
 
         private void Redo_button_Click(object sender, EventArgs e)
         {
-            if(actionID != actions.Count - 1)
+            if (undoneActions.Count > 0)
             {
-                actionID++;
-                actions[actionID].Redo(ref points, ref radius, ref color);
-                ActionsCounter.Text = actionID.ToString();
+                undoneActions.Peek().Redo(ref points, ref radius, ref color);
+                actions.Push(undoneActions.Pop());
                 Refresh();
             }
-            Refresh();
         }
 
         private Vertex[] GetDeletedPoints(Vertex[] iPs, List<Vertex> rPs)
@@ -164,9 +153,8 @@ namespace WindowsFormsApp3
                 AddPoint(e.X, e.Y);
                 initPoints = points.ToArray();
                 Refresh();
-                Vertex[] killedPoints = GetDeletedPoints(initPoints, points);
-                DeletedPointsCounter.Text = initPoints.Length.ToString();
                 AddAction(new AddPoint(points[points.Count - 1], GetDeletedPoints(initPoints, points)));
+                initPoints = null;
             }
 
             if (hitnum != -1)
@@ -218,10 +206,8 @@ namespace WindowsFormsApp3
             }
             if(carried)
             {
-                Vertex[] killedPoints = GetDeletedPoints(initPoints, points);
-                DeletedPointsCounter.Text = initPoints.Length.ToString();
                 AddAction(new MovePoints(movedPoints, GetDeletedPoints(initPoints, points), initX, initY, e.X, e.Y));
-                initPoints = new Vertex[0];
+                initPoints = null;
             }
             
             if (isFigureCarried)
@@ -657,16 +643,20 @@ namespace WindowsFormsApp3
         #region Shaking_buttons_handler
         private void startShaking_button_Click(object sender, EventArgs e)
         {
-            //shaking = true;
             timer1.Start();
-            initPoints = points.ToArray();
+            shakIPoints = points.ToArray();
+            Undo_button.Enabled = false;
+            Redo_button.Enabled = false;
         }
 
         private void stopShaking_button_Click(object sender, EventArgs e)
         {
-            //shaking = false;
             timer1.Stop();
-            AddAction(new Shaking(initPoints, points.ToArray()));
+            AddAction(new Shaking(shakIPoints, points.ToArray()));
+            ActionsCounter.Text = shakIPoints.Count().ToString();
+            initPoints = null;
+            Undo_button.Enabled = true;
+            Redo_button.Enabled = true;
         }
         #endregion
 
